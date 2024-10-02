@@ -1,4 +1,4 @@
-# Implementation of the paper ["An Evaluation of Channel Estimation Method Using Deep Learning for OFDM System"](https://ieeexplore.ieee.org/document/10625125)  
+## Implementation of the paper ["An Evaluation of Channel Estimation Method Using Deep Learning for OFDM System"](https://ieeexplore.ieee.org/document/10625125)  
 Presented in: 2024 Fifteenth International Conference on Ubiquitous and Future Networks (ICUFN)
 
 ## Abstract
@@ -9,10 +9,17 @@ In the time- and frequency-variant mobile radio channel such as the Fifth- and F
 - [short (Japanese)](https://1drv.ms/p/c/91b183a988eac49f/EUXK5924eRtKjSmBextnGSkBwHFdLO41UaTgX4DAh12VNg?e=8cuDKf)
 - [long (English)](https://1drv.ms/p/c/91b183a988eac49f/EVNWYS9BwAxEmv601Qu1fAEBDTzdUJJrPkj1lcu5cI0g6w?e=lX507H)
 
+## set-up
+    cd CNN-based_OFDM_Chaneel_Estimation
+    addpath("module","model","train_data")
 ## Data Preparation
 1. Run `generate_train_data.m` to generate training data.
     ```matlab
-    [train_data, train_labels, mp] = generate_train_data(12800, np, nrb);
+   dataSize = 12800;
+   np = [3, 8, 12]; % Pilot positions along the time axis
+   NRB = 20; % Number of resource blocks along the frequency axis
+   [trainData, trainLabels, MP] = generate_train_data(dataSize, np, NRB);
+   % MP - Pilot positions along the frequency axis
     ```
 2. Save the generated data to `train_data.mat`.
     ```matlab
@@ -55,4 +62,3 @@ In the time- and frequency-variant mobile radio channel such as the Fifth- and F
 
 ## Notes
 - MATLAB Deep Learning Toolbox is required.
-- Adjust the data saving paths and parameters as needed.
