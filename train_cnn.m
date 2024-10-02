@@ -1,12 +1,12 @@
 clear
 trainModel = true;
-loadTrainData = false;
+loadTrainData = true;
 
 data_size=12800;
 NRB = 20;
 pos=2; % pilot position pattern 1 or 2
 
-matName_FSRCNN=sprintf("FSRCNN_Pos%d_RB%d",pos,NRB);
+matName_FSRCNN=sprintf("model/FSRCNN_Pos%d_RB%d.mat",pos,NRB);
 switch pos
     case 1
         np=[3 12];
@@ -22,7 +22,7 @@ end
 
 if trainModel
     if loadTrainData
-        load('trainData.mat')
+        load('train_data/trainData.mat')
     else
         [trainData,trainLabels,MP] = generate_train_data(data_size,np,NRB);
         save('train_data/trainData.mat','trainData','trainLabels','MP')
@@ -75,7 +75,7 @@ if trainModel
     % Set up a training policy
     options = trainingOptions('adam', ...
         'InitialLearnRate',1e-3, ...
-        'MaxEpochs',1, ...
+        'MaxEpochs',10, ...
         'Shuffle','every-epoch', ...
         'Verbose',false, ...
         'Plots','training-progress', ...
