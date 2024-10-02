@@ -4,7 +4,7 @@ tic;
 %% variable 
 pos=2; % pilot(DM-RS) allocation type of 5G. dmrs-AdditionalPosition= pos1 or pos2
 NRB = 20; % subcarrier number = 12*NRB
-monte=1; 
+monte=1;  % 
 slots=20; % for ideal & practical LMMSE
 
 %% fixed parameters
@@ -19,7 +19,7 @@ m_1RB = 12; n_1RB =14; % 1RB= m_1RB carriers * n_1RB time slots
 fc=50*10^9; % carrier freqency
 
 
-matName_FSRCNN=sprintf("FSRCNN_Pos%d_RB%d",pos,NRB);
+matName_FSRCNN=sprintf("model/FSRCNN_Pos%d_RB%d.mat",pos,NRB);
 
 if pos==1
     np=[3 12]; % pilot timeslot of 1RB
