@@ -1,4 +1,5 @@
-Implementation of the paper "An Evaluation of Channel Estimation Method Using Deep Learning for OFDM System"
+Implementation of the paper "An Evaluation of Channel Estimation Method Using Deep Learning for OFDM System"  
+Published in: 2024 Fifteenth International Conference on Ubiquitous and Future Networks (ICUFN)
 https://ieeexplore.ieee.org/document/10625125
 
 # Abstract
