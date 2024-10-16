@@ -1,6 +1,8 @@
+%% before run file,
+%% set working directory to the src
 clear; 
 tic;
-
+addpath("../module")
 %% variable 
 pos=2; % pilot(DM-RS) allocation type of 5G. dmrs-AdditionalPosition= pos1 or pos2
 NRB = 20; % subcarrier number = 12*NRB

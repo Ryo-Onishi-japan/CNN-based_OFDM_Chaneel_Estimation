@@ -9,11 +9,6 @@ In the time- and frequency-variant mobile radio channel such as the Fifth- and F
 - [short (Japanese)](https://1drv.ms/p/c/91b183a988eac49f/EUXK5924eRtKjSmBextnGSkBwHFdLO41UaTgX4DAh12VNg?e=8cuDKf)
 - [long (English)](https://1drv.ms/p/c/91b183a988eac49f/EVNWYS9BwAxEmv601Qu1fAEBDTzdUJJrPkj1lcu5cI0g6w?e=lX507H)
 
-## set-up
-```sh
-    cd CNN-based_OFDM_Chaneel_Estimation
-    addpath("module","model","train_data")
-```
 
 ## How to Run
 1. Run `train_cnn.m` to train the model.
