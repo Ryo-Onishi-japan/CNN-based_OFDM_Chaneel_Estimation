@@ -1,5 +1,5 @@
 %% before run file,
-%% set working directory to the "CNN-based_OFDM_Chaneel_Estimation"
+%% set working directory to the "CNN-based_OFDM_Chaneel_Estimation\src"
 clear;
 currentDir = pwd; 
 fprintf('Current Directory: %s\n', currentDir);
@@ -7,7 +7,7 @@ fprintf('Current Directory: %s\n', currentDir);
 %% Prepare data
 data_size=12800;
 NRB = 20;
-global pos=2; % pilot position pattern 1 or 2
+pos=2; % pilot position pattern 1 or 2
 
 switch pos
     case 1
@@ -20,10 +20,10 @@ end
 
 loadTrainData = true;
 if loadTrainData
-    load('train_data/trainData.mat')
+    load('..\train_data\trainData.mat')
 else
     [trainData,trainLabels,MP] = generate_train_data(data_size,np,NRB);
-    save('train_data/trainData.mat','trainData','trainLabels','MP')
+    save('..\train_data\trainData.mat','trainData','trainLabels','MP')
 end
 
 
@@ -58,7 +58,7 @@ ObjFcn = makeObjFcn(XTrain,YTrain,XValidation,YValidation);
 
 %% Perform Bayesian Optimization
 BayesObject = bayesopt(ObjFcn,optimVars, ...
-    'MaxTime',14*60*60, ...
+    'MaxTime',10*60, ...
     'IsObjectiveDeterministic',false, ...
     'UseParallel',false);
 
@@ -75,9 +75,15 @@ valError = savedStruct.valError
 function ObjFcn = makeObjFcn(XTrain,YTrain,XValidation,YValidation)
 ObjFcn = @valErrorFun;
     function [valError,cons,fileName] = valErrorFun(optVars)
+
+        % Should be specified by a global variable
+        pos = 2; 
+        MP = [1:2:239];
+        np=[3 8 12];
         
         % Define the CNN structure
-        switch global pos
+
+        switch pos
             case 1
                 transposedCNN= transposedConv2dLayer([8 9],1,...
                     "Stride",[2 7],"Cropping",[3 1]);
@@ -113,7 +119,6 @@ ObjFcn = @valErrorFun;
         
                 transposedCNN
 
-                regressionLayer
         ];
 
         batchSize = 128;
@@ -121,28 +126,31 @@ ObjFcn = @valErrorFun;
         validationFrequency = round(size(XTrain,4)/batchSize /5);
         options = trainingOptions('adam', ...
             'InitialLearnRate',optVars.InitialLearnRate, ...
-            'MaxEpochs',10, ...         
+            'MaxEpochs',2, ...         
             'MiniBatchSize',batchSize, ...
             'L2Regularization',optVars.L2Regularization, ...
             'Shuffle','every-epoch', ...
             'Verbose',false, ...
             'Plots','training-progress', ...
             'ValidationData',{XValidation,YValidation}, ...
-            'ValidationFrequency',validationFrequency);
+            'ValidationFrequency',validationFrequency, ...
             'ValidationPatience',5);
 
         lossFunction = "mean-squared-error";
 
-        trainedNet =  trainnet(trainData, trainLabels, layers, lossFunction, options);
+        trainedNet =  trainnet(XTrain, YTrain, layers, lossFunction, options);
         close(findall(groot,'Tag','NNET_CNN_TRAININGPLOT_UIFIGURE'))
 
         % Calculate the validation error
         YPredicred = predict(trainedNet,XValidation);
         valError = YValidation - YPredicred;
         valError = mean(valError(:).^2); % need to remove dmrs_loc from error calculation
+        disp(valError)
 
         fileName = num2str(valError) + ".mat";
-        save(fileName,'trainedNet','valError','options')
+        % save(fileName,'trainedNet','valError','options')
+        directoryPath = '../log/test_';  
+        save((directoryPath + fileName), 'trainedNet', 'valError', 'options')
         cons = [];
         
     end
