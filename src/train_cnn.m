@@ -83,14 +83,15 @@ if trainModel
         'ValidationData',{valData, valLabels}, ...
         'ValidationFrequency',valFrequency, ...
         'ValidationPatience',5);
-    
+
+    lossFunction = "mean-squared-error";
+
     % Train the network. The saved structure trainingInfo contains the
     % training progress for later inspection. This structure is useful for
     % comparing optimal convergence speeds of different optimization
     % methods.
-    [channelEstimationCNN,trainingInfo] = trainNetwork(trainData, ...
-        trainLabels,layers,options);
-
+    [channelEstimationCNN,trainingInfo] = trainnet(trainData, ...
+        trainLabels,layers,lossFunction,options);
 
     save(matName_FSRCNN, 'channelEstimationCNN')
 end

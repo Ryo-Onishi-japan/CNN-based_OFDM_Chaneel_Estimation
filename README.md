@@ -14,6 +14,8 @@ In the time- and frequency-variant mobile radio channel such as the Fifth- and F
 1. Run `train_cnn.m` to train the model.
 2. Run `main.m` to test the deep learning method and conventional methods.
 
+- To generate training data at `D:\Desktop\CNN-based_OFDM_Chaneel_Estimation\train_data\trainData.mat`, run `train_cnn.m` with `loadTrainData = false;`.
+
 
 ## Major Files and Folders
 - `generate_train_data.m`: Script to generate training data.
