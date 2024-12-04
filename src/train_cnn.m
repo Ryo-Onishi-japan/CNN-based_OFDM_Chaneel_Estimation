@@ -1,8 +1,9 @@
-clear
+clear;
+close all;
 trainModel = true;
 loadTrainData = false;
 
-data_size=12800;
+data_size=128;
 NRB = 20;
 pos=2; % pilot position pattern 1 or 2
 
@@ -29,7 +30,7 @@ if trainModel
     end
 
     % Set the number of examples per mini-batch
-    batchSize=128;
+    batchSize=16;
 
     % Split real and imaginary grids into 2 image sets, then concatenate
     trainData = cat(4,trainData(:,:,1,:),trainData(:,:,2,:));
@@ -69,17 +70,17 @@ if trainModel
     
             transposedCNN
 
-            regressionLayer
         ];
     
     % Set up a training policy
     options = trainingOptions('adam', ...
-        'InitialLearnRate',1e-3, ...
-        'MaxEpochs',10, ...
+        'InitialLearnRate',1e-3, ...  # default
+        'MaxEpochs',10, ...         
+        'MiniBatchSize',batchSize, ...
+        'L2Regularization',0.0001, ...  # default
         'Shuffle','every-epoch', ...
         'Verbose',false, ...
         'Plots','training-progress', ...
-        'MiniBatchSize',batchSize, ...
         'ValidationData',{valData, valLabels}, ...
         'ValidationFrequency',valFrequency, ...
         'ValidationPatience',5);
