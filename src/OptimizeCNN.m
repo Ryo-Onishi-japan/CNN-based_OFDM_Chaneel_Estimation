@@ -1,11 +1,15 @@
 %% before run file,
 %% set working directory to the "CNN-based_OFDM_Chaneel_Estimation\src"
+%% run addpath("module","model","train_data")
 clear;
+close all;
 currentDir = pwd; 
 fprintf('Current Directory: %s\n', currentDir);
 
 %% Prepare data
-data_size=12800;
+
+test_data_ratio = 0.8;
+data_size=12800;  
 NRB = 20;
 pos=2; % pilot position pattern 1 or 2
 
@@ -18,7 +22,7 @@ switch pos
         warning('Unexpected pos value')
 end
 
-loadTrainData = true;
+loadTrainData = false;
 if loadTrainData
     load('..\train_data\trainData.mat')
 else
@@ -32,33 +36,25 @@ end
 trainData = cat(4,trainData(:,:,1,:),trainData(:,:,2,:));
 trainLabels = cat(4,trainLabels(:,:,1,:),trainLabels(:,:,2,:));
 
-% Split into training, validation, test sets
-XTrain = trainData;
-YTrain = trainLabels;
-data_size = size(YTrain,4);
-idx = randperm(data_size,data_size*0.2);
-idx_test = idx(1:length(idx)/2);
-idx_validation = idx(length(idx)/2+1:end);
+batchSize=128;
+% Split into training and validation sets
+XValidation = trainData(:,:,:,1:batchSize);
+YValidation = trainLabels(:,:,:,1:batchSize);
+XTrain = trainData(:,:,:,batchSize+1:end);
+YTrain = trainLabels(:,:,:,batchSize+1:end);
 
-XTrain(:,:,:,idx) = [];
-XTest = trainData(:,:,:,idx_test);
-XValidation = trainData(:,:,:,idx_validation);
-
-YTrain(:,:,:,idx) = [];
-YTest = trainLabels(:,:,:,idx_test);
-YValidation = trainLabels(:,:,:,idx_validation);
 
 %% Choose Variables to Optimize
 optimVars = [
     % optimizableVariable('SectionDepth',[1 3],'Type','integer')
-    optimizableVariable('InitialLearnRate',[1e-2 1],'Transform','log')
+    optimizableVariable('InitialLearnRate',[1e-4 1],'Transform','log')
     optimizableVariable('L2Regularization',[1e-10 1e-2],'Transform','log')];
 
 ObjFcn = makeObjFcn(XTrain,YTrain,XValidation,YValidation);
 
 %% Perform Bayesian Optimization
 BayesObject = bayesopt(ObjFcn,optimVars, ...
-    'MaxTime',10*60, ...
+    'MaxTime',3*60, ...
     'IsObjectiveDeterministic',false, ...
     'UseParallel',false);
 
