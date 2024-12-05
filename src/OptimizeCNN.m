@@ -9,7 +9,7 @@ fprintf('Current Directory: %s\n', currentDir);
 %% Prepare data
 
 test_data_ratio = 0.8;
-data_size=128;  
+data_size=12800;  
 NRB = 20;
 pos=2; % pilot position pattern 1 or 2
 
@@ -54,7 +54,7 @@ ObjFcn = makeObjFcn(XTrain,YTrain,XValidation,YValidation);
 
 %% Perform Bayesian Optimization
 BayesObject = bayesopt(ObjFcn,optimVars, ...
-    'MaxTime',10*60, ...
+    'MaxTime',1*60*60, ...
     'IsObjectiveDeterministic',false, ...
     'UseParallel',false);
 

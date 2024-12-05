@@ -1,0 +1,55 @@
+|=====================================================================================================|
+| Iter | Eval   | Objective   | Objective   | BestSoFar   | BestSoFar   | InitialLearn-| L2Regulariza-|
+|      | result |             | runtime     | (observed)  | (estim.)    | Rate         | tion         |
+|=====================================================================================================|
+|    1 | Best   |    0.016754 |      419.21 |    0.016754 |    0.016754 |    0.0069285 |   5.3147e-05 |
+    1.3880
+
+|    2 | Accept |       1.388 |      77.092 |    0.016754 |     0.10594 |      0.71544 |   2.8864e-06 |
+    1.2178
+
+|    3 | Accept |      1.2178 |      91.296 |    0.016754 |    0.016884 |      0.25971 |   2.7775e-10 |
+    0.0157
+
+|    4 | Best   |     0.01573 |      526.27 |     0.01573 |    0.015718 |   0.00052993 |   6.0407e-10 |
+    0.0157
+
+|    5 | Best   |    0.015663 |      544.43 |    0.015663 |    0.015178 |    0.0020342 |   5.6539e-05 |
+    0.0184
+
+|    6 | Accept |    0.018421 |      698.08 |    0.015663 |    0.015116 |   0.00010014 |   5.9429e-10 |
+    0.0161
+
+|    7 | Accept |     0.01613 |      692.52 |    0.015663 |    0.014838 |   0.00021456 |    1.136e-09 |
+    0.0159
+
+|    8 | Accept |    0.015949 |      323.49 |    0.015663 |    0.013547 |     0.004116 |   2.5938e-07 |
+    0.0152
+
+|    9 | Best   |    0.015193 |      613.28 |    0.015193 |    0.013458 |    0.0010219 |   2.9385e-05 |
+
+__________________________________________________________
+Optimization completed.
+MaxTime of 3600 seconds reached.
+Total function evaluations: 9
+Total elapsed time: 4001.9435 seconds
+Total objective function evaluation time: 3985.6684
+
+Best observed feasible point:
+    InitialLearnRate    L2Regularization
+    ________________    ________________
+
+       0.0010219           2.9385e-05
+
+Observed objective function value = 0.015193
+Estimated objective function value = 0.01525
+Function evaluation time = 613.2788
+
+Best estimated feasible point (according to models):
+    InitialLearnRate    L2Regularization
+    ________________    ________________
+
+        0.004116           2.5938e-07
+
+Estimated objective function value = 0.013458
+Estimated function evaluation time = 351.1021
