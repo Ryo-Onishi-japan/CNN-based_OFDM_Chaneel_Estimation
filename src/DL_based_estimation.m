@@ -1,12 +1,117 @@
+clear;
+close all;
+addpath("../module")
+trainModel = true;
+loadTrainData = false;
+
+data_size=3200;  % 12800 % 128 
+batchSize=128;
+
+NRB = 20;
+pos=2; % pilot position pattern 1 or 2
+
+matName_FSRCNN=sprintf('../model/FSRCNN_Pos%d_RB%d_data%d_batch%d.mat',pos,NRB,data_size,batchSize);
+% matName_FSRCNN = '../model/FSRCNN_Pos2_RB20.mat';
+
+
+switch pos
+    case 1
+        np=[3 12];
+        transposedCNN= transposedConv2dLayer([8 9],1,...
+             "Stride",[2 7],"Cropping",[3 1]);
+    case 2
+        np=[3 8 12];
+        transposedCNN= transposedConv2dLayer([8 8],1,...
+             "Stride",[2 5],"Cropping",[3 2]) ;
+     otherwise
+        warning('Unexpected pos value')
+end
+
+if trainModel
+    if loadTrainData
+        load('../train_data/trainData.mat')
+    else
+        [trainData,trainLabels,MP] = generate_train_data(data_size,np,NRB);
+        save('../train_data/trainData.mat','trainData','trainLabels','MP')
+    end
+
+    % Set the number of examples per mini-batch
+
+    % Split real and imaginary grids into 2 image sets, then concatenate
+    trainData = cat(4,trainData(:,:,1,:),trainData(:,:,2,:));
+    trainLabels = cat(4,trainLabels(:,:,1,:),trainLabels(:,:,2,:));
+    
+    % Split into training and validation sets
+    valData = trainData(:,:,:,1:batchSize);
+    valLabels = trainLabels(:,:,:,1:batchSize);
+    trainData = trainData(:,:,:,batchSize+1:end);
+    trainLabels = trainLabels(:,:,:,batchSize+1:end);
+    
+    % Set the validation frequency
+    valFrequency = round(size(trainData,4)/batchSize/5);
+
+    % Define the CNN structure
+    d=56;s=12;m=4;
+    Mapping=[];
+    for i=1:m
+        Mapping=[
+                Mapping
+                convolution2dLayer(3,s,'Padding','same')
+                reluLayer
+        ];
+    end
+    layers = [ ...
+            imageInputLayer([length(MP) length(np) 1],'Normalization','none')
+            convolution2dLayer(5,d,'Padding','same')
+            reluLayer
+
+            convolution2dLayer(1,s,'Padding','same')
+            reluLayer
+    
+            Mapping
+    
+            convolution2dLayer(1,d,'Padding','same')
+            reluLayer
+    
+            transposedCNN
+
+        ];
+    
+    % Set up a training policy
+    options = trainingOptions('adam', ...
+        'InitialLearnRate',1e-3, ...  # default
+        'MaxEpochs',10, ...         
+        'MiniBatchSize',batchSize, ...
+        'L2Regularization',1e-4, ...  # default
+        'Shuffle','every-epoch', ...
+        'Verbose',false, ...
+        'Plots','training-progress', ...
+        'ValidationData',{valData, valLabels}, ...
+        'ValidationFrequency',valFrequency, ...
+        'ValidationPatience',5);
+
+    lossFunction = "mean-squared-error";
+
+    % Train the network. The saved structure trainingInfo contains the
+    % training progress for later inspection. This structure is useful for
+    % comparing optimal convergence speeds of different optimization
+    % methods.
+    [channelEstimationCNN,trainingInfo] = trainnet(trainData, ...
+        trainLabels,layers,lossFunction,options);
+
+    save(matName_FSRCNN, 'channelEstimationCNN')
+end
+
+
+
 %% before run file,
 %% set working directory to the src
-clear; 
-tic;
-addpath("../module")
+
+
 %% variable 
-pos=2; % pilot(DM-RS) allocation type of 5G. dmrs-AdditionalPosition= pos1 or pos2
-NRB = 20; % subcarrier number = 12*NRB
-monte=1;  % 
+%pos=2; % pilot(DM-RS) allocation type of 5G. dmrs-AdditionalPosition= pos1 or pos2
+%NRB = 20; % subcarrier number = 12*NRB
+monte=100;  % 
 slots=20; % for ideal & practical LMMSE
 
 %% fixed parameters
@@ -20,8 +125,6 @@ CP = 0.07; %　percentage of cyclic prefic
 m_1RB = 12; n_1RB =14; % 1RB= m_1RB carriers * n_1RB time slots
 fc=50*10^9; % carrier freqency
 
-
-matName_FSRCNN=sprintf("../model/FSRCNN_Pos%d_RB%d.mat",pos,NRB);
 
 if pos==1
     np=[3 12]; % pilot timeslot of 1RB
@@ -62,13 +165,14 @@ DMRS_LMMSE_n=(dmrsDiag_n*dmrsDiag_n');
 dmrsDiag_m=diag(dmrsSym_m);
 DMRS_LMMSE_m=(dmrsDiag_m*dmrsDiag_m');
 
+load(matName_FSRCNN);           
 
 
 
 for k=1:length(SNRdB)
-    if  SNRdB(k)>=25; Monte=30*monte;
-    elseif SNRdB(k)>=15; Monte=20*monte;
-    elseif SNRdB(k)>=10 Monte=6*monte;
+    if  SNRdB(k)>=25; Monte=15*monte;
+    elseif SNRdB(k)>=15; Monte=10*monte;
+    elseif SNRdB(k)>=10; Monte=6*monte;
     else Monte=3*monte;
     end;
 
@@ -144,73 +248,9 @@ for k=1:length(SNRdB)
         H_e = H_perfect-H_linear;
         H_e = H_e(:); H_e(dmrs_loc)=[];
         mse(1,j) = mean(abs(H_e).^2)  ;
-
-
-        %% perfect LMMSE 
-        mode="perfect";
-        % get Rh_LS over some slots
-        Rh_LS = channel_autocorrelation(mode,t0,DelayProfile,DS,fd,slots,Tofdm,...
-        n_1user,Pn,Nofdm,Ng,m_1user,MP,NP, ...
-        dmrs_loc,...
-        dmrsSym,sOFDM,...
-        Nfft);
-        % frequency Rh
-        I=eye(length(MP));
-        H_lmmse_perfect = Rh_LS/(Rh_LS+(Pn*I)/DMRS_LMMSE_m )*H_LS;%
-        % QPSK
-        % H_lmmse_perfect = Rh_LS/(Rh_LS+2*I*Pn*I)*H_LS;%
-
-        % f axis 
-        H_LMMSEf_perfect=zeros(m_1user,length(NP));
-        for i=1:length(NP)
-            H_LMMSEf_perfect(:,i) = ...
-              interp1(MP,H_lmmse_perfect(:,i),1:m_1user,'linear','extrap');
-        end
-        % t axis
-        H_LMMSE_perfect=zeros(m_1user,n_1user);
-        for i=1:m_1user
-            H_LMMSE_perfect(i,:) = ...
-              interp1(NP,H_LMMSEf_perfect(i,:),[1:n_1user],'linear','extrap');
-        end
-
-        normalized_H_LMMSE_perfect=H_LMMSE_perfect/maxH;
-        H_e = H_perfect-H_LMMSE_perfect;
-        H_e = H_e(:); H_e(dmrs_loc)=[];
-        mse(2,j) = mean(abs(H_e).^2)  ;
-
-        %% practical LMMSE 
-        mode="practical";
-        % get Rh_LS over some slots
-        Rh_LS = channel_autocorrelation(mode,t0,DelayProfile,DS,fd,slots,Tofdm,...
-        n_1user,Pn,Nofdm,Ng,m_1user,MP,NP, ...
-        dmrs_loc,...
-        dmrsSym,sOFDM,...
-        Nfft);
-        % frequency Rh
-        I=eye(length(MP));
-        H_lmmse_practical = Rh_LS/(Rh_LS+(Pn*I)/DMRS_LMMSE_m)*H_LS;%
-
-        % f axis 
-        H_LMMSEf_practical=zeros(m_1user,length(NP));
-        for i=1:length(NP)
-            H_LMMSEf_practical(:,i) = ...
-              interp1(MP,H_lmmse_practical(:,i),1:m_1user,'linear','extrap');
-        end
-        % t axis
-        H_LMMSE_practical=zeros(m_1user,n_1user);
-        for i=1:m_1user
-            H_LMMSE_practical(i,:) = ...
-              interp1(NP,H_LMMSEf_practical(i,:),[1:n_1user],'linear','extrap');
-        end
-
-        normalized_H_LMMSE_practical=H_LMMSE_practical/maxH;
-        H_e = H_perfect-H_LMMSE_practical;
-        H_e = H_e(:); H_e(dmrs_loc)=[];
-        mse(3,j) = mean(abs(H_e).^2)  ;
-
+       
  
         %% FSRCNN
-        load(matName_FSRCNN);
         nnInput = cat(4,real(H_LS),imag(H_LS));
         H_cnn = predict(channelEstimationCNN,nnInput);
         H_FSRCNN(1:m_1user,1:n_1user) = H_cnn(:,:,1,1)+ 1i*H_cnn(:,:,1,2);
@@ -225,27 +265,23 @@ end
 
 %% MSE
 
-
 figure;
 markersize=15;
 semilogy(SNRdB,MSE(1,:),'r+-','MarkerSize',markersize);hold on;
-semilogy(SNRdB,MSE(3,:),'bo-','MarkerSize',markersize);hold on;
-semilogy(SNRdB,MSE(2,:),'g^-','MarkerSize',markersize);hold on;grid on;
 semilogy(SNRdB,MSE(4,:),'ksquare-','MarkerSize',markersize);hold on;
 
 xlabel('SNR[dB]') 
 ylabel('MSE')
 legend('LS',...
-    'practical LMMSE','ideal LMMSE',...
     '深層学習','FontSize',22);
 xlim([0 SNRdB(end)])
 set(gca,'FontSize',22)
 
 % channel matrix surface figure
 figure;surf(real(H_perfect(:,:)));title('perfect')
-figure;surf(real(H_linear(:,:)));title('LS');
-figure;surf(real(H_LMMSE_perfect(:,:)));title('ideal LMMSE');
 figure;surf(real(H_FSRCNN(:,:)));title('深層学習');
 
+MSE_FSRCNN = MSE(4,:);
+save(sprintf('results/dlMSE_Pos%d_RB%d_data%d_batch%d.mat',pos,NRB,data_size,batchSize),'MSE_FSRCNN');
 
 toc;

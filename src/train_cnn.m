@@ -1,6 +1,6 @@
 clear;
 close all;
-trainModel = true;
+trainModel = false;
 loadTrainData = false;
 
 data_size=128;
@@ -77,7 +77,7 @@ if trainModel
         'InitialLearnRate',1e-3, ...  # default
         'MaxEpochs',10, ...         
         'MiniBatchSize',batchSize, ...
-        'L2Regularization',0.0001, ...  # default
+        'L2Regularization',1e-4, ...  # default
         'Shuffle','every-epoch', ...
         'Verbose',false, ...
         'Plots','training-progress', ...
