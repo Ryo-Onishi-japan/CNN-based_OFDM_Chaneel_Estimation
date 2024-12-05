@@ -1,10 +1,12 @@
 clear;
 close all;
 addpath("../module")
+addpath("../results")
+
 trainModel = true;
 loadTrainData = false;
 
-data_size=3200;  % 12800 % 128 
+data_size=12800;  % 12800じゃないとhigh snrで性能悪い
 batchSize=128;
 
 NRB = 20;
@@ -264,24 +266,29 @@ for k=1:length(SNRdB)
 end     
 
 %% MSE
+MSE_FSRCNN = MSE(4,:);
+
+addpath("D:\Desktop\CNN-based_OFDM_Chaneel_Estimation\results")
+save(sprintf('results/dlMSE_Pos%d_RB%d_data%d_batch%d.mat',pos,NRB,data_size,batchSize),'MSE_FSRCNN');
+
+load("traditionalMSE_Pos2_RB20.mat");
 
 figure;
 markersize=15;
 semilogy(SNRdB,MSE(1,:),'r+-','MarkerSize',markersize);hold on;
-semilogy(SNRdB,MSE(4,:),'ksquare-','MarkerSize',markersize);hold on;
+semilogy(SNRdB,MSE(3,:),'bo-','MarkerSize',markersize);hold on;
+semilogy(SNRdB,MSE(2,:),'g^-','MarkerSize',markersize);hold on;grid on;
+semilogy(SNRdB,MSE_FSRCNN,'ksquare-','MarkerSize',markersize);hold on;
 
 xlabel('SNR[dB]') 
 ylabel('MSE')
 legend('LS',...
-    '深層学習','FontSize',22);
+    'practical LMMSE','ideal LMMSE','深層学習',...
+    'FontSize',22);
 xlim([0 SNRdB(end)])
 set(gca,'FontSize',22)
 
-% channel matrix surface figure
-figure;surf(real(H_perfect(:,:)));title('perfect')
-figure;surf(real(H_FSRCNN(:,:)));title('深層学習');
 
-MSE_FSRCNN = MSE(4,:);
-save(sprintf('results/dlMSE_Pos%d_RB%d_data%d_batch%d.mat',pos,NRB,data_size,batchSize),'MSE_FSRCNN');
+
 
 toc;
