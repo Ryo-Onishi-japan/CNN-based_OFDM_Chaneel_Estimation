@@ -166,7 +166,6 @@ end
 %% MSE
 MSE_bestFSRCNN = MSE(4,:);
 
-addpath("D:\Desktop\CNN-based_OFDM_Chaneel_Estimation\results")
 
 % Extract the part before '.mat'
 namePart = matName_FSRCNN(1:end-4);
@@ -195,6 +194,9 @@ ylabel('MSE')
 legend('LS',...
     'practical LMMSE','ideal LMMSE','深層学習（通常）','深層学習（ベイズ）',...
     'FontSize',22);
+% legend('LS',...
+%     'LMMSE','深層学習（デフォルト）','深層学習（ベイズ）',...
+%     'FontSize',22);
 xlim([0 SNRdB(end)])
 set(gca,'FontSize',22)
 

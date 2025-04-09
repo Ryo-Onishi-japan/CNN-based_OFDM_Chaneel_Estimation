@@ -230,15 +230,16 @@ end
 figure;
 markersize=15;
 semilogy(SNRdB,MSE(1,:),'r+-','MarkerSize',markersize);hold on;
+semilogy(SNRdB,MSE(2,:),'go-','MarkerSize',markersize);hold on;grid on;
 semilogy(SNRdB,MSE(3,:),'bo-','MarkerSize',markersize);hold on;
-semilogy(SNRdB,MSE(2,:),'g^-','MarkerSize',markersize);hold on;grid on;
 % semilogy(SNRdB,MSE(4,:),'ksquare-','MarkerSize',markersize);hold on;
 
 xlabel('SNR[dB]') 
 ylabel('MSE')
 legend('LS',...
-    'practical LMMSE','ideal LMMSE',...
+    'ideal LMMSE','practical LMMSE',...
     'FontSize',22);
+% legend('LS','LMMSE')
 xlim([0 SNRdB(end)])
 set(gca,'FontSize',22)
 
