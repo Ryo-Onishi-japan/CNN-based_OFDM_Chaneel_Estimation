@@ -3,32 +3,25 @@
 %% run addpath("module","model","train_data")
 clear;
 close all;
-currentDir = pwd; 
-fprintf('Current Directory: %s\n', currentDir);
+%% currentDir = pwd; 
+%% fprintf('Current Directory: %s\n', currentDir);
 
 %% Prepare data
+%%
+% 
+%  PREFORMATTED
+%  TEXT
+% 
 
-test_data_ratio = 0.8;
-data_size=12800;  
+data_size=14080;  
+
+
+
 NRB = 20;
 pos=2; % pilot position pattern 1 or 2
+np=[3 8 12];
 
-switch pos
-    case 1
-        np=[3 12];
-    case 2
-        np=[3 8 12];
-    otherwise
-        warning('Unexpected pos value')
-end
-
-loadTrainData = false;
-if loadTrainData
-    load('..\train_data\trainData.mat')
-else
-    [trainData,trainLabels,MP] = generate_train_data(data_size,np,NRB);
-    save('..\train_data\trainData.mat','trainData','trainLabels','MP')
-end
+[trainData,trainLabels,MP] = generate_train_data(data_size,np,NRB);
 
 
 %%
@@ -36,25 +29,24 @@ end
 trainData = cat(4,trainData(:,:,1,:),trainData(:,:,2,:));
 trainLabels = cat(4,trainLabels(:,:,1,:),trainLabels(:,:,2,:));
 
-batchSize=128;
 % Split into training and validation sets
-XValidation = trainData(:,:,:,1:batchSize);
-YValidation = trainLabels(:,:,:,1:batchSize);
-XTrain = trainData(:,:,:,batchSize+1:end);
-YTrain = trainLabels(:,:,:,batchSize+1:end);
+val_data_size = 2 * 1280; % 2=Real&imaginary, 1280 is fixed val data size
+valData = trainData(:,:,:,1:val_data_size);
+valLabels = trainLabels(:,:,:,1:val_data_size);
+trainData = trainData(:,:,:,val_data_size+1:end);
+trainLabels = trainLabels(:,:,:,val_data_size+1:end);
 
 
 %% Choose Variables to Optimize
 optimVars = [
-    % optimizableVariable('SectionDepth',[1 3],'Type','integer')
     optimizableVariable('InitialLearnRate',[1e-4 1],'Transform','log')
     optimizableVariable('L2Regularization',[1e-10 1e-2],'Transform','log')];
 
-ObjFcn = makeObjFcn(XTrain,YTrain,XValidation,YValidation);
+ObjFcn = makeObjFcn(trainData,trainLabels,valData,valLabels);
 
 %% Perform Bayesian Optimization
 BayesObject = bayesopt(ObjFcn,optimVars, ...
-    'MaxTime',1*60*60, ...
+    'MaxTime',1*60, ... % seconds
     'IsObjectiveDeterministic',false, ...
     'UseParallel',false);
 
@@ -117,20 +109,19 @@ ObjFcn = @valErrorFun;
 
         ];
 
-        batchSize = 16;
+        batchSize = 128;
         % 5 validation per epoch
         validationFrequency = round(size(XTrain,4)/batchSize /5);
         options = trainingOptions('adam', ...
             'InitialLearnRate',optVars.InitialLearnRate, ...
-            'MaxEpochs',10, ...         
+            'MaxEpochs',3, ...         
             'MiniBatchSize',batchSize, ...
             'L2Regularization',optVars.L2Regularization, ...
             'Shuffle','every-epoch', ...
             'Verbose',false, ...
             'Plots','training-progress', ...
             'ValidationData',{XValidation,YValidation}, ...
-            'ValidationFrequency',validationFrequency, ...
-            'ValidationPatience',5);
+            'ValidationFrequency',validationFrequency);
 
         lossFunction = "mean-squared-error";
 

@@ -2,19 +2,18 @@ clear;
 close all;
 addpath("../module")
 addpath("../results")
-addpath("../log")
+addpath("../"); % config.mのパスを追加
+params = configs();
 
-matName_FSRCNN = 'test_0.015193.mat';
+%% Manually set parameters
+matName_FSRCNN_normal=sprintf('../results/FSRCNN（通常）.mat');
+pos=2; % pilot(DM-RS) allocation type of 5G. dmrs-AdditionalPosition= pos1 or pos2
 
-
-
-NRB = 20;
-pos=2; % pilot position pattern 1 or 2
-
-monte=100;  % 
-slots=20; % for ideal & practical LMMSE
 
 %% fixed parameters
+numTrials=params.numTrials;  
+slots=20; % for ideal & practical LMMSE
+NRB = 20; % the number of subcarrier  = 12*NRB
 scs = 60e3; % subcarrier spacing 
 mp = [1:2:12]; % pilot carrier of 1RB
 Nfft=512;
@@ -24,7 +23,6 @@ Nslot = 1; % number of RBs along time axis
 CP = 0.07; %　percentage of cyclic prefic
 m_1RB = 12; n_1RB =14; % 1RB= m_1RB carriers * n_1RB time slots
 fc=50*10^9; % carrier freqency
-
 
 if pos==1
     np=[3 12]; % pilot timeslot of 1RB
@@ -49,11 +47,8 @@ b = repmat(MP',1,length(NP));
 c = a+b;
 dmrs_loc = c(:);
 
-%% Monte preparing
-SNRdB = 0:5:30;
 
-%% LMMSE prepare
-%% also DMRS genaration
+%% LMMSE preparation and DMRS genaration
 dmrsBit=randi([0 1],1,bps*(Ndmrs/length(NP)));
 dmrsSym_m=modu(dmrsBit,M);
 dmrsSym=[]; 
@@ -65,19 +60,18 @@ DMRS_LMMSE_n=(dmrsDiag_n*dmrsDiag_n');
 dmrsDiag_m=diag(dmrsSym_m);
 DMRS_LMMSE_m=(dmrsDiag_m*dmrsDiag_m');
 
-load(matName_FSRCNN);           
 
-
-
+%% Monte preparing
+SNRdB = 0:5:30;
 for k=1:length(SNRdB)
-    if  SNRdB(k)>=25; Monte=15*monte;
-    elseif SNRdB(k)>=15; Monte=10*monte;
-    elseif SNRdB(k)>=10; Monte=6*monte;
-    else Monte=3*monte;
+    if  SNRdB(k)>=25; Monte=15*numTrials;
+    elseif SNRdB(k)>=15; Monte=10*numTrials;
+    elseif SNRdB(k)>=10; Monte=6*numTrials;
+    else Monte=3*numTrials;
     end;
 
 
-    fprintf('%d[dB] %dMonte\n',SNRdB(k),Monte);
+    fprintf('%d[dB] %dSimulations\n',SNRdB(k),Monte);
 
     for j=1:Monte
         %% randomness
@@ -148,59 +142,97 @@ for k=1:length(SNRdB)
         H_e = H_perfect-H_linear;
         H_e = H_e(:); H_e(dmrs_loc)=[];
         mse(1,j) = mean(abs(H_e).^2)  ;
-       
- 
-        %% FSRCNN（bays)
-        nnInput = cat(4,real(H_LS),imag(H_LS));
-        H_cnn = predict(trainedNet,nnInput);
-        H_FSRCNN(1:m_1user,1:n_1user) = H_cnn(:,:,1,1)+ 1i*H_cnn(:,:,1,2);
-        normalized_H_FSRCNN=H_FSRCNN/maxH;
-        H_e = H_perfect-H_FSRCNN;
-        H_e=H_e(:); H_e(dmrs_loc)=[];
-        mse(4,j) = mean(abs(H_e).^2)  ;
+
+
+        %% perfect LMMSE 
+        mode="perfect";
+        % get Rh_LS over some slots
+        Rh_LS = channel_autocorrelation(mode,t0,DelayProfile,DS,fd,slots,Tofdm,...
+        n_1user,Pn,Nofdm,Ng,m_1user,MP,NP, ...
+        dmrs_loc,...
+        dmrsSym,sOFDM,...
+        Nfft);
+        % frequency Rh
+        I=eye(length(MP));
+        H_lmmse_perfect = Rh_LS/(Rh_LS+(Pn*I)/DMRS_LMMSE_m )*H_LS;%
+        % QPSK
+        % H_lmmse_perfect = Rh_LS/(Rh_LS+2*I*Pn*I)*H_LS;%
+
+        % f axis 
+        H_LMMSEf_perfect=zeros(m_1user,length(NP));
+        for i=1:length(NP)
+            H_LMMSEf_perfect(:,i) = ...
+              interp1(MP,H_lmmse_perfect(:,i),1:m_1user,'linear','extrap');
+        end
+        % t axis
+        H_LMMSE_perfect=zeros(m_1user,n_1user);
+        for i=1:m_1user
+            H_LMMSE_perfect(i,:) = ...
+              interp1(NP,H_LMMSEf_perfect(i,:),[1:n_1user],'linear','extrap');
+        end
+
+        normalized_H_LMMSE_perfect=H_LMMSE_perfect/maxH;
+        H_e = H_perfect-H_LMMSE_perfect;
+        H_e = H_e(:); H_e(dmrs_loc)=[];
+        mse(2,j) = mean(abs(H_e).^2)  ;
+
+        %% practical LMMSE 
+        mode="practical";
+        % get Rh_LS over some slots
+        Rh_LS = channel_autocorrelation(mode,t0,DelayProfile,DS,fd,slots,Tofdm,...
+        n_1user,Pn,Nofdm,Ng,m_1user,MP,NP, ...
+        dmrs_loc,...
+        dmrsSym,sOFDM,...
+        Nfft);
+        % frequency Rh
+        I=eye(length(MP));
+        H_lmmse_practical = Rh_LS/(Rh_LS+(Pn*I)/DMRS_LMMSE_m)*H_LS;%
+
+        % f axis 
+        H_LMMSEf_practical=zeros(m_1user,length(NP));
+        for i=1:length(NP)
+            H_LMMSEf_practical(:,i) = ...
+              interp1(MP,H_lmmse_practical(:,i),1:m_1user,'linear','extrap');
+        end
+        % t axis
+        H_LMMSE_practical=zeros(m_1user,n_1user);
+        for i=1:m_1user
+            H_LMMSE_practical(i,:) = ...
+              interp1(NP,H_LMMSEf_practical(i,:),[1:n_1user],'linear','extrap');
+        end
+
+        normalized_H_LMMSE_practical=H_LMMSE_practical/maxH;
+        H_e = H_perfect-H_LMMSE_practical;
+        H_e = H_e(:); H_e(dmrs_loc)=[];
+        mse(3,j) = mean(abs(H_e).^2)  ;
+
 
     end
     MSE(:,k)=mean(mse,2);
 end     
 
-%% MSE
-MSE_bestFSRCNN = MSE(4,:);
 
-
-% Extract the part before '.mat'
-namePart = matName_FSRCNN(1:end-4);
-% Construct the new string
-save_path = ['results/baysMSE_' namePart '.mat'];
-addpath("D:\Desktop\CNN-based_OFDM_Chaneel_Estimation\results")
-
-save(save_path,'MSE_bestFSRCNN');
-
-load("traditionalMSE_Pos2_RB20.mat");
-% Load the .mat file
-data = load("results/dlMSE_Pos2_RB20_data12800_batch128.mat");
-% Extract the MSE_FSRCNN field as a double array
-MSE_normalFSRCNN = data.MSE_FSRCNN;
-
+%% plot MSE
 figure;
 markersize=15;
 semilogy(SNRdB,MSE(1,:),'r+-','MarkerSize',markersize);hold on;
+semilogy(SNRdB,MSE(2,:),'go-','MarkerSize',markersize);hold on;grid on;
 semilogy(SNRdB,MSE(3,:),'bo-','MarkerSize',markersize);hold on;
-semilogy(SNRdB,MSE(2,:),'g^-','MarkerSize',markersize);hold on;grid on;
-semilogy(SNRdB,MSE_normalFSRCNN,'ksquare-','MarkerSize',markersize);hold on;
-semilogy(SNRdB,MSE_bestFSRCNN,'k^-','MarkerSize',markersize);hold on;
 
 xlabel('SNR[dB]') 
 ylabel('MSE')
 legend('LS',...
-    'practical LMMSE','ideal LMMSE','深層学習（通常）','深層学習（ベイズ）',...
+    'ideal LMMSE','practical LMMSE',...
     'FontSize',22);
-% legend('LS',...
-%     'LMMSE','深層学習（デフォルト）','深層学習（ベイズ）',...
-%     'FontSize',22);
 xlim([0 SNRdB(end)])
 set(gca,'FontSize',22)
 
+save("../results/MSE_traditional.mat","MSE(1:3,:)");
 
-
-
-toc;
+%% plot surf
+figure;surf(real(H_perfect(:,:))); 
+set(gca, 'FontSize', 15); view(330, 15);zlim([-2 2]);%title('perfect')
+figure;surf(real(H_linear(:,:)));
+set(gca, 'FontSize', 15); view(310, 5); zlim([-2 2]);% title('LS');
+figure;surf(real(H_LMMSE_perfect(:,:)));
+set(gca, 'FontSize', 15); view(310, 5); zlim([-2 2]);% title('ideal LMMSE');

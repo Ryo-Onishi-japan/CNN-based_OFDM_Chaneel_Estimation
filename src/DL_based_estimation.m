@@ -6,14 +6,14 @@ addpath("../results")
 trainModel = true;
 loadTrainData = false;
 
-data_size=12800;  % 12800じゃないとhigh snrで性能悪い
+data_size=14080; 
 batchSize=128;
 
 NRB = 20;
 pos=2; % pilot position pattern 1 or 2
 
-matName_FSRCNN=sprintf('../model/FSRCNN_Pos%d_RB%d_data%d_batch%d.mat',pos,NRB,data_size,batchSize);
-% matName_FSRCNN = '../model/FSRCNN_Pos2_RB20.mat';
+matName_FSRCNN=sprintf('../model/FSRCNN（通常）.mat');
+% matName_FSRCNN = '../model/FSRCNN_Pos2_RB20_batch128.mat';
 
 
 switch pos
@@ -37,17 +37,17 @@ if trainModel
         save('../train_data/trainData.mat','trainData','trainLabels','MP')
     end
 
-    % Set the number of examples per mini-batch
 
     % Split real and imaginary grids into 2 image sets, then concatenate
     trainData = cat(4,trainData(:,:,1,:),trainData(:,:,2,:));
     trainLabels = cat(4,trainLabels(:,:,1,:),trainLabels(:,:,2,:));
     
     % Split into training and validation sets
-    valData = trainData(:,:,:,1:batchSize);
-    valLabels = trainLabels(:,:,:,1:batchSize);
-    trainData = trainData(:,:,:,batchSize+1:end);
-    trainLabels = trainLabels(:,:,:,batchSize+1:end);
+    val_data_size = 2 * 1280; %2=Real&imaginary, 1280 is fixed val data size
+    valData = trainData(:,:,:,1:val_data_size);
+    valLabels = trainLabels(:,:,:,1:val_data_size);
+    trainData = trainData(:,:,:,val_data_size+1:end);
+    trainLabels = trainLabels(:,:,:,val_data_size+1:end);
     
     % Set the validation frequency
     valFrequency = round(size(trainData,4)/batchSize/5);
@@ -82,15 +82,14 @@ if trainModel
     % Set up a training policy
     options = trainingOptions('adam', ...
         'InitialLearnRate',1e-3, ...  # default
-        'MaxEpochs',10, ...         
+        'MaxEpochs',3, ...         
         'MiniBatchSize',batchSize, ...
         'L2Regularization',1e-4, ...  # default
         'Shuffle','every-epoch', ...
         'Verbose',false, ...
         'Plots','training-progress', ...
         'ValidationData',{valData, valLabels}, ...
-        'ValidationFrequency',valFrequency, ...
-        'ValidationPatience',5);
+        'ValidationFrequency',valFrequency);
 
     lossFunction = "mean-squared-error";
 

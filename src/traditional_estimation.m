@@ -1,13 +1,15 @@
-%% before run file,
-%% set working directory to the src
-clear; 
-tic;
+clear;
+close all;
 addpath("../module")
 addpath("../results")
-%% variable 
+addpath("../"); % config.mのパスを追加
+params = configs();
+
+%% Manually set parameters
+matName_FSRCNN=sprintf('../results/FSRCNN（通常）.mat');
+
 pos=2; % pilot(DM-RS) allocation type of 5G. dmrs-AdditionalPosition= pos1 or pos2
 NRB = 20; % subcarrier number = 12*NRB
-monte=100;  % 
 slots=20; % for ideal & practical LMMSE
 
 %% fixed parameters
@@ -67,10 +69,10 @@ DMRS_LMMSE_m=(dmrsDiag_m*dmrsDiag_m');
 
 
 for k=1:length(SNRdB)
-    if  SNRdB(k)>=25; Monte=15*monte;
-    elseif SNRdB(k)>=15; Monte=10*monte;
-    elseif SNRdB(k)>=10; Monte=6*monte;
-    else Monte=3*monte;
+    if  SNRdB(k)>=25; Monte=15*params.numTrials;
+    elseif SNRdB(k)>=15; Monte=10*params.numTrials;
+    elseif SNRdB(k)>=10; Monte=6*numTrials;
+    else Monte=3*numTrials;
     end;
 
 
