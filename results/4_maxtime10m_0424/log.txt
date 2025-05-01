@@ -1,0 +1,183 @@
+Parameters:
+           numTrials: 100
+            DataSize: 14080
+         ValDataSize: 1280
+                   D: 56
+                   S: 12
+                   M: 4
+           MaxEpochs: 10
+       MiniBatchSize: 128
+    InitialLearnRate: 1.0000e-03
+    L2Regularization: 1.0000e-04
+             Shuffle: 'every-epoch'
+        lossFunction: "mean-squared-error"
+
+--------------------
+Optimization Variables:
+  <a href="matlab:helpPopup('optimizableVariable')" style="font-weight:bold">optimizableVariable</a> のプロパティ:
+
+         Name: 'InitialLearnRate'
+        Range: [1.0000e-05 0.1000]
+         Type: 'real'
+    Transform: 'log'
+     Optimize: 1
+
+  <a href="matlab:helpPopup('optimizableVariable')" style="font-weight:bold">optimizableVariable</a> のプロパティ:
+
+         Name: 'L2Regularization'
+        Range: [1.0000e-06 0.0100]
+         Type: 'real'
+    Transform: 'log'
+     Optimize: 1
+
+  <a href="matlab:helpPopup('optimizableVariable')" style="font-weight:bold">optimizableVariable</a> のプロパティ:
+
+         Name: 'MiniBatchPower'
+        Range: [3 11]
+         Type: 'integer'
+    Transform: 'none'
+     Optimize: 1
+
+  <a href="matlab:helpPopup('optimizableVariable')" style="font-weight:bold">optimizableVariable</a> のプロパティ:
+
+         Name: 'GradientDecayFactor'
+        Range: [0.6000 0.9900]
+         Type: 'real'
+    Transform: 'none'
+     Optimize: 1
+
+--------------------
+|===================================================================================================================================|
+| Iter | Eval   | Objective   | Objective   | BestSoFar   | BestSoFar   | InitialLearn-| L2Regulariza-| MiniBatchPow-| GradientDeca-|
+|      | result |             | runtime     | (observed)  | (estim.)    | Rate         | tion         | er           | yFactor      |
+|===================================================================================================================================|
+|    1 | Best   |    0.034157 |       39.56 |    0.034157 |    0.034157 |      0.00242 |    0.0047846 |            7 |       0.6099 |
+|    2 | Best   |    0.029744 |       231.4 |    0.029744 |    0.031267 |   1.3354e-05 |   1.1816e-05 |            4 |        0.798 |
+|    3 | Best   |    0.026205 |      17.014 |    0.026205 |    0.026214 |    0.0034729 |   4.1628e-06 |            9 |      0.73807 |
+|    4 | Accept |    0.030009 |      113.66 |    0.026205 |     0.02629 |     0.024667 |    0.0023756 |            6 |      0.95644 |
+|    5 | Accept |      1.1891 |      42.241 |    0.026205 |    0.026224 |     0.072178 |   2.8887e-06 |            8 |      0.71814 |
+|    6 | Accept |       1.189 |      19.652 |    0.026205 |    0.026276 |     0.014208 |   1.1084e-05 |           10 |      0.74637 |
+|    7 | Best   |    0.023237 |      48.397 |    0.023237 |    0.023215 |     0.001521 |    6.561e-05 |            7 |      0.70885 |
+|    8 | Accept |    0.037677 |      32.022 |    0.023237 |     0.02335 |    0.0016811 |    0.0097478 |            8 |       0.8261 |
+|    9 | Best   |    0.022194 |      477.08 |    0.022194 |    0.022187 |     0.012855 |   1.2473e-05 |            4 |      0.82692 |
+
+__________________________________________________________
+最適化が完了しました。
+MaxTime の 600 秒に達しました。
+関数の評価回数の合計: 9
+経過時間の合計: 1026.4292 秒
+目的関数の評価時間の合計: 1021.0213
+
+最適な観測実行可能点:
+    InitialLearnRate    L2Regularization    MiniBatchPower    GradientDecayFactor
+    ________________    ________________    ______________    ___________________
+
+        0.012855           1.2473e-05             4                 0.82692      
+
+観測された目的関数値 = 0.022194
+推定される目的関数値 = 0.022187
+関数の評価時間 = 477.0751
+
+最適な推定実行可能点 (モデルに基づく):
+    InitialLearnRate    L2Regularization    MiniBatchPower    GradientDecayFactor
+    ________________    ________________    ______________    ___________________
+
+        0.012855           1.2473e-05             4                 0.82692      
+
+推定される目的関数値 = 0.022187
+推定される関数評価時間 = 60.5037
+
+
+matname_bestnetwork = 
+
+    "..\results\4_0424\0.022194.mat"
+
+0[dB] 300 Simulations
+5[dB] 300 Simulations
+10[dB] 600 Simulations
+15[dB] 1000 Simulations
+20[dB] 1000 Simulations
+25[dB] 1500 Simulations
+30[dB] 1500 Simulations
+{次を使用中のエラー: <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('save')" style="font-weight:bold">save</a>
+'4_0424' が存在しないため、'MSE_bays.mat' を作成できません。
+
+エラー: <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('find_test_bestCNN', 'C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\src改良中\find_test_bestCNN.m', 296)" style="font-weight:bold">find_test_bestCNN</a> (<a href="matlab: opentoline('C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\src改良中\find_test_bestCNN.m',296,0)">行 296</a>)
+    %% plot MSE
+} 
+close all
+    save(fullfile(results_dir, "MSE_bays.mat"),"MSE_FSRCNN_bays")
+   figure;
+    markersize=15;
+    load("../results/MSE_traditional.mat");
+{次を使用中のエラー: <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('load')" style="font-weight:bold">load</a>
+../results/MSE_traditional.mat は現在のフォルダーまたは MATLAB パス上に見つかりませんが、次の場所にあります。
+ C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\results
+    C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\src改良中
+    C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\src
+
+MATLAB の現在のフォルダーを変更 または そのフォルダーを MATLAB パスに追加。
+} 
+addpath(" C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\results
+ addpath(" C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\results
+         ↑
+{エラー: 文字列の終端が正しくありません。
+} 
+addpath(" C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\results
+ addpath(" C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\results
+         ↑
+{エラー: 文字列の終端が正しくありません。
+} 
+addpath(" C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\results
+ addpath(" C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\results
+         ↑
+{エラー: 文字列の終端が正しくありません。
+} 
+addpath("C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\results
+ addpath("C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\results
+         ↑
+{エラー: 文字列の終端が正しくありません。
+} 
+ addpath("C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\results
+  addpath("C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\results
+          ↑
+{エラー: 文字列の終端が正しくありません。
+} 
+     addpath("C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\results")
+  figure;
+    markersize=15;
+    load("../results/MSE_traditional.mat");
+{次を使用中のエラー: <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('load')" style="font-weight:bold">load</a>
+../results/MSE_traditional.mat は現在のフォルダーまたは MATLAB パス上に見つかりませんが、次の場所にあります。
+ C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\results
+    C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\src改良中
+    C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\src
+
+MATLAB の現在のフォルダーを変更 または そのフォルダーを MATLAB パスに追加。
+} 
+clear
+load('MSE_FSRCNN_normal.mat')
+figure
+    semilogy(SNRdB,MSE_FSRCNN_normal,'ksquare-','MarkerSize',markersize);hold on;
+{関数または変数 'SNRdB' が認識されません。
+} 
+SNRdb=0:5:30;
+    semilogy(SNRdB,MSE_FSRCNN_normal,'ksquare-','MarkerSize',markersize);hold on;
+{関数または変数 'SNRdB' が認識されません。
+} 
+SNRdB=SNRdb
+
+SNRdB =
+
+     0     5    10    15    20    25    30
+
+    semilogy(SNRdB,MSE_FSRCNN_normal,'ksquare-','MarkerSize',markersize);hold on;
+{関数または変数 'markersize' が認識されません。
+} 
+    markersize=15;
+
+    semilogy(SNRdB,MSE_FSRCNN_normal,'ksquare-','MarkerSize',markersize);hold on;
+
+load('MSE_bays.mat')
+    semilogy(SNRdB,MSE_FSRCNN_bays,'k^-','MarkerSize',markersize);
+

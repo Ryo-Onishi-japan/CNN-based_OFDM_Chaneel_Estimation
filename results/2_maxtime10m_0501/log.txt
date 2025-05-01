@@ -1,0 +1,129 @@
+Parameters:
+           numTrials: 100
+            DataSize: 14080
+         ValDataSize: 1280
+                   D: 56
+                   S: 12
+                   M: 4
+           MaxEpochs: 10
+       MiniBatchSize: 128
+    InitialLearnRate: 1.0000e-03
+    L2Regularization: 1.0000e-04
+             Shuffle: 'every-epoch'
+        lossFunction: "mean-squared-error"
+
+--------------------
+Optimization Variables:
+  <a href="matlab:helpPopup('optimizableVariable')" style="font-weight:bold">optimizableVariable</a> のプロパティ:
+
+         Name: 'InitialLearnRate'
+        Range: [1.0000e-05 0.1000]
+         Type: 'real'
+    Transform: 'log'
+     Optimize: 1
+
+  <a href="matlab:helpPopup('optimizableVariable')" style="font-weight:bold">optimizableVariable</a> のプロパティ:
+
+         Name: 'L2Regularization'
+        Range: [1.0000e-06 0.0100]
+         Type: 'real'
+    Transform: 'log'
+     Optimize: 1
+
+--------------------
+|=====================================================================================================|
+| Iter | Eval   | Objective   | Objective   | BestSoFar   | BestSoFar   | InitialLearn-| L2Regulariza-|
+|      | result |             | runtime     | (observed)  | (estim.)    | Rate         | tion         |
+|=====================================================================================================|
+|    1 | Best   |    0.055355 |      65.284 |    0.055355 |    0.055355 |   3.6873e-05 |    0.0047215 |
+|    2 | Best   |    0.033046 |      23.499 |    0.033046 |    0.034143 |   6.3904e-05 |   1.2595e-06 |
+|    3 | Best   |    0.031938 |      23.077 |    0.031938 |    0.031941 |     0.018194 |    3.427e-06 |
+|    4 | Accept |       1.189 |       22.59 |    0.031938 |    0.031987 |     0.094194 |    0.0094047 |
+|    5 | Best   |    0.022063 |      23.602 |    0.022063 |    0.022018 |    0.0011151 |   2.0854e-06 |
+|    6 | Accept |     0.13676 |      24.876 |    0.022063 |    0.022014 |   1.0023e-05 |   0.00014993 |
+|    7 | Accept |       1.189 |       23.17 |    0.022063 |    0.022093 |       0.0946 |   1.0158e-06 |
+|    8 | Accept |    0.023304 |       23.76 |    0.022063 |    0.022099 |    0.0061341 |   0.00051348 |
+|    9 | Accept |    0.026598 |      22.596 |    0.022063 |    0.022104 |   0.00030073 |   1.2991e-05 |
+|   10 | Best   |    0.021668 |      24.866 |    0.021668 |    0.021226 |     0.011177 |    8.017e-06 |
+|   11 | Best   |    0.020544 |      23.121 |    0.020544 |    0.020488 |    0.0025304 |   3.2511e-06 |
+|   12 | Accept |    0.028667 |      22.942 |    0.020544 |     0.02047 |   0.00014392 |    2.586e-05 |
+|   13 | Accept |    0.024955 |       23.68 |    0.020544 |    0.020147 |   0.00058503 |    6.067e-06 |
+|   14 | Best   |    0.020181 |      22.871 |    0.020181 |    0.020209 |    0.0038172 |   2.0403e-06 |
+|   15 | Accept |    0.025934 |      23.368 |    0.020181 |    0.020226 |     0.013783 |   0.00031566 |
+|   16 | Accept |    0.020953 |      23.325 |    0.020181 |    0.020482 |    0.0017352 |   1.0139e-06 |
+|   17 | Accept |    0.020481 |      23.426 |    0.020181 |    0.020197 |    0.0031558 |   1.0192e-06 |
+|   18 | Best   |     0.02016 |      23.366 |     0.02016 |    0.020247 |      0.00443 |   1.0809e-06 |
+|   19 | Accept |    0.021236 |      22.254 |     0.02016 |    0.020235 |    0.0021585 |   1.0628e-06 |
+|   20 | Accept |     0.02045 |      22.559 |     0.02016 |    0.020175 |    0.0038023 |   1.0475e-06 |
+|=====================================================================================================|
+| Iter | Eval   | Objective   | Objective   | BestSoFar   | BestSoFar   | InitialLearn-| L2Regulariza-|
+|      | result |             | runtime     | (observed)  | (estim.)    | Rate         | tion         |
+|=====================================================================================================|
+|   21 | Accept |    0.020606 |      22.646 |     0.02016 |    0.020217 |    0.0044353 |   1.0919e-06 |
+|   22 | Accept |    0.021279 |      22.721 |     0.02016 |    0.020218 |    0.0014338 |   1.0754e-06 |
+|   23 | Accept |    0.020418 |      23.008 |     0.02016 |    0.020259 |    0.0078687 |   1.0521e-06 |
+|   24 | Accept |    0.022199 |      22.821 |     0.02016 |    0.020273 |     0.012807 |   1.0436e-06 |
+
+__________________________________________________________
+最適化が完了しました。
+MaxTime の 600 秒に達しました。
+関数の評価回数の合計: 24
+経過時間の合計: 612.9256 秒
+目的関数の評価時間の合計: 599.4295
+
+最適な観測実行可能点:
+    InitialLearnRate    L2Regularization
+    ________________    ________________
+
+        0.00443            1.0809e-06   
+
+観測された目的関数値 = 0.02016
+推定される目的関数値 = 0.020416
+関数の評価時間 = 23.3663
+
+最適な推定実行可能点 (モデルに基づく):
+    InitialLearnRate    L2Regularization
+    ________________    ________________
+
+       0.0038023           1.0475e-06   
+
+推定される目的関数値 = 0.020273
+推定される関数評価時間 = 22.8933
+
+
+matname_bestnetwork = 
+
+    "..\results\2_0501\0.02016.mat"
+
+0[dB] 300 Simulations
+5[dB] 300 Simulations
+10[dB] 600 Simulations
+15[dB] 1000 Simulations
+20[dB] 1000 Simulations
+25[dB] 1500 Simulations
+30[dB] 1500 Simulations
+経過時間は 2727.788148 秒です。
+load('MSE_bays.mat')
+    semilogy(SNRdB,MSE_FSRCNN_bays,'k--','MarkerSize',markersize);
+    legend('LS',...
+        'ideal LMMSE','practical LMMSE',...
+        '深層学習（通常）','深層学習（bays_2変数）',深層学習（bays_4変数）,...
+         '深層学習（通常）','深層学習（bays_2変数）',深層学習（bays_4変数）,...
+                                               ↑
+{エラー: テキスト文字が正しくありません。サポートされていない記号、非表示の文字、または非 ASCII 文字の貼り付けをチェックしてください。
+} 
+    legend('LS',...
+        'ideal LMMSE','practical LMMSE',...
+        '深層学習（通常）','深層学習（bays_2変数）','深層学習（bays_4変数）',...
+        'FontSize',22);
+find_test_bestCNN
+[警告: 名前が存在しないか、ディレクトリではありません C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\results\4_0424\..\module] 
+[> <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('path', 'C:\Program Files\MATLAB\R2024a\toolbox\matlab\general\path.m', 109)" style="font-weight:bold">path</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2024a\toolbox\matlab\general\path.m',109,0)">行 109</a>) 内
+<a href="matlab:matlab.lang.internal.introspective.errorDocCallback('addpath>doPathAddition', 'C:\Program Files\MATLAB\R2024a\toolbox\matlab\general\addpath.m', 126)" style="font-weight:bold">addpath>doPathAddition</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2024a\toolbox\matlab\general\addpath.m',126,0)">行 126</a>) 内
+<a href="matlab:matlab.lang.internal.introspective.errorDocCallback('addpath', 'C:\Program Files\MATLAB\R2024a\toolbox\matlab\general\addpath.m', 90)" style="font-weight:bold">addpath</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2024a\toolbox\matlab\general\addpath.m',90,0)">行 90</a>) 内
+<a href="matlab:matlab.lang.internal.introspective.errorDocCallback('find_test_bestCNN', 'C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\src改良中\find_test_bestCNN.m', 3)" style="font-weight:bold">find_test_bestCNN</a> (<a href="matlab: opentoline('C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\src改良中\find_test_bestCNN.m',3,0)">行 3</a>) 内] 
+[警告: 名前が存在しないか、ディレクトリではありません C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\results\4_0424\..\results] 
+[> <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('path', 'C:\Program Files\MATLAB\R2024a\toolbox\matlab\general\path.m', 109)" style="font-weight:bold">path</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2024a\toolbox\matlab\general\path.m',109,0)">行 109</a>) 内
+<a href="matlab:matlab.lang.internal.introspective.errorDocCallback('addpath>doPathAddition', 'C:\Program Files\MATLAB\R2024a\toolbox\matlab\general\addpath.m', 126)" style="font-weight:bold">addpath>doPathAddition</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2024a\toolbox\matlab\general\addpath.m',126,0)">行 126</a>) 内
+<a href="matlab:matlab.lang.internal.introspective.errorDocCallback('addpath', 'C:\Program Files\MATLAB\R2024a\toolbox\matlab\general\addpath.m', 90)" style="font-weight:bold">addpath</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2024a\toolbox\matlab\general\addpath.m',90,0)">行 90</a>) 内
+<a href="matlab:matlab.lang.internal.introspective.errorDocCallback('find_test_bestCNN', 'C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\src改良中\find_test_bestCNN.m', 4)" style="font-weight:bold">find_test_bestCNN</a> (<a href="matlab: opentoline('C:\Users\ide-lab\OneDrive - Kyushu University\研究2025\code\CNN-based_OFDM_Chaneel_Estimation\src改良中\find_test_bestCNN.m',4,0)">行 4</a>) 内] 
