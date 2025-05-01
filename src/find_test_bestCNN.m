@@ -9,8 +9,9 @@ global pos np MP output_folder
 
 %% Manually set parameters
 testMSE = true;
+output_folder = '2_maxtime30m_0501';
+maxtime = 30;
 
-output_folder = '2_0424';
 NRB = 20;
 pos=2; % pilot position pattern 1 or 2
 
@@ -26,9 +27,13 @@ mkdir(results_dir);
 diary(fullfile(results_dir, 'log.txt'));
 diary on
 
+disp(sprintf('Max time = %d minutes', maxtime))
+
 disp('Parameters:')
 disp(params)
 disp('--------------------')
+
+
 
 %% prepare training data
 switch pos
@@ -58,8 +63,8 @@ trainLabels = trainLabels(:,:,:,val_data_size+1:end);
 optimVars = [
     optimizableVariable('InitialLearnRate', [params.InitialLearnRate/100, params.InitialLearnRate*100], 'Transform', 'log')
     optimizableVariable('L2Regularization', [params.L2Regularization/100, params.L2Regularization*100], 'Transform', 'log')
-    optimizableVariable('MiniBatchPower',[3 11],'Type','integer')  % 2^3=8 ～ 2^11=2048 # defalt 2^7=128
-    optimizableVariable('GradientDecayFactor',[0.6 0.99])
+    % optimizableVariable('MiniBatchPower',[3 11],'Type','integer')  % 2^3=8 ～ 2^11=2048 # defalt 2^7=128
+    % optimizableVariable('GradientDecayFactor',[0.6 0.99])
 ];
 
 
@@ -75,7 +80,7 @@ ObjFcn = makeObjFcn(trainData,trainLabels,valData,valLabels,params);
 
 %% Perform Bayesian Optimization
 BayesObject = bayesopt(ObjFcn,optimVars, ...
-    'MaxTime',10*60, ... % seconds
+    'MaxTime',maxtime*60, ... % seconds
     'IsObjectiveDeterministic',false, ...
     'UseParallel',false);
 
@@ -142,15 +147,14 @@ ObjFcn = @valErrorFun;
         % 5 validation per epoch
         validationFrequency = round(size(XTrain,4)/params.MiniBatchSize /5);
         options = trainingOptions('adam', ...
-            'MaxEpochs',params.MaxEpochs,... %params.MaxEpochs, ...
-            'MiniBatchSize',2^optVars.MiniBatchPower, ...
+            'MaxEpochs',params.MaxEpochs,... %'MiniBatchSize',2^optVars.MiniBatchPower, ...
+            'MiniBatchSize',params.MiniBatchSize, ...
             'InitialLearnRate',optVars.InitialLearnRate, ...
             'L2Regularization',optVars.L2Regularization, ...
             'Shuffle',params.Shuffle, ...
             'Verbose',false, ...             %'Plots','training-progress', ...
             'ValidationData',{XValidation,YValidation}, ...
-            'ValidationFrequency',validationFrequency,...
-            'GradientDecayFactor',optVars.GradientDecayFactor,...
+            'ValidationFrequency',validationFrequency,...%'GradientDecayFactor',optVars.GradientDecayFactor,...
             'ExecutionEnvironment','gpu');
 
         lossFunction = params.lossFunction;
@@ -303,6 +307,11 @@ if testMSE
     semilogy(SNRdB,MSE(3,:),'bo-','MarkerSize',markersize);hold on;
     semilogy(SNRdB,MSE_FSRCNN_normal,'ksquare-','MarkerSize',markersize);hold on;
     semilogy(SNRdB,MSE_FSRCNN_bays,'k^-','MarkerSize',markersize);
+    % semilogy(SNRdB,MSE_FSRCNN_bays,'k--','MarkerSize',markersize);
+    % legend('LS',...
+    %     'ideal LMMSE','practical LMMSE',...
+    %     '深層学習（通常）','深層学習（bays_2変数）','深層学習（bays_4変数）',...
+    %     'FontSize',22);
 
     xlabel('SNR[dB]') 
     ylabel('MSE')
