@@ -19,8 +19,6 @@ In the time- and frequency-variant mobile radio channel such as the Fifth- and F
 - `generate_train_data.m`: Script to generate training data.
 - `module/`: containing utility functions and modules used in the project.
 - `model/`:containing the deep learning model definitions.
-- `train_data/`: generated training data is stored.
-
 
 ## Notes
 - MATLAB Deep Learning Toolbox is required.
