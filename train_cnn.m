@@ -1,6 +1,6 @@
 clear
 trainModel = true;
-loadTrainData = true;
+loadTrainData = false;
 
 data_size=12800;
 NRB = 20;
@@ -94,5 +94,6 @@ if trainModel
 
     save(matName_FSRCNN, 'channelEstimationCNN')
 end
+
 
 
