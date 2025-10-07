@@ -1,10 +1,11 @@
 clear; 
 tic;
+addpath("module","model");
 
 %% variable 
 pos=2; % pilot(DM-RS) allocation type of 5G. dmrs-AdditionalPosition= pos1 or pos2
 NRB = 20; % subcarrier number = 12*NRB
-monte=1;  % 
+monte=100;  % 
 slots=20; % for ideal & practical LMMSE
 
 %% fixed parameters
@@ -64,16 +65,9 @@ DMRS_LMMSE_m=(dmrsDiag_m*dmrsDiag_m');
 
 
 for k=1:length(SNRdB)
-    if  SNRdB(k)>=25; Monte=30*monte;
-    elseif SNRdB(k)>=15; Monte=20*monte;
-    elseif SNRdB(k)>=10 Monte=6*monte;
-    else Monte=3*monte;
-    end;
+    fprintf('Processing %d[dB]\n',SNRdB(k));
 
-
-    fprintf('%d[dB] %dMonte\n',SNRdB(k),Monte);
-
-    for j=1:Monte
+    for j=1:monte
         %% randomness
         t0=randi([0 10000],1,1); % randam initail time (1=1ofdm symbol duration)
         v=randi([0 60],1,1);
@@ -244,6 +238,7 @@ figure;surf(real(H_perfect(:,:)));title('perfect')
 figure;surf(real(H_linear(:,:)));title('LS');
 figure;surf(real(H_LMMSE_perfect(:,:)));title('ideal LMMSE');
 figure;surf(real(H_FSRCNN(:,:)));title('深層学習');
+
 
 
 toc;
