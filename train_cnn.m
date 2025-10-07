@@ -1,4 +1,6 @@
 clear
+addpath("module","model");
+
 trainModel = true;
 loadTrainData = false;
 
@@ -99,6 +101,7 @@ if trainModel
 
     save(matName_FSRCNN, 'channelEstimationCNN')
 end
+
 
 
 
