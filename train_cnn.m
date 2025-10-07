@@ -24,6 +24,11 @@ if trainModel
     if loadTrainData
         load('train_data/trainData.mat')
     else
+
+        if ~exist('train_data', 'dir')
+            mkdir('train_data')
+        end
+        
         [trainData,trainLabels,MP] = generate_train_data(data_size,np,NRB);
         save('train_data/trainData.mat','trainData','trainLabels','MP')
     end
@@ -94,6 +99,7 @@ if trainModel
 
     save(matName_FSRCNN, 'channelEstimationCNN')
 end
+
 
 
 
