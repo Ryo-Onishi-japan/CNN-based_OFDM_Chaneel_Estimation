@@ -12,7 +12,7 @@ In the time- and frequency-variant mobile radio channel such as the Fifth- and F
 ## set-up
 ```sh
     cd CNN-based_OFDM_Chaneel_Estimation
-    addpath("module","model","train_data")
+    addpath("module","model")
 ```
 
 ## How to Run
